@@ -1,0 +1,53 @@
+spring:
+  cloud:
+    consul:
+      host: localhost
+      port: 8500
+      discovery:
+        enabled: true
+      config:
+        enabled: true
+        format: yaml
+  config:
+    import: 'consul:'
+  application:
+    name: notification-service
+
+email:
+  allowedEmails:
+    - gmail.com
+    - yahoo.com
+    - yahoo.co.uk
+    - outlook.com
+    - hotmail.com
+    - icloud.com
+    - mail.com
+    - aol.com
+    - protonmail.com
+    - zoho.com
+    - gmx.com
+    - gmx.de
+    - web.de
+    - tutanota.com
+    - seznam.cz
+    - wp.pl
+    - o2.pl
+    - onet.pl
+    - interia.pl
+    - gazeta.pl
+    - poczta.fm
+    - tlen.pl
+    - ukr.net
+    - i.ua
+    - meta.ua
+    - bigmir.net
+    - email.ua
+    - mail.ua
+    - yandex.com
+    - yandex.ru
+    - mail.ru
+    - bk.ru
+    - inbox.ru
+    - list.ru
+    - rambler.ru
+    - tut.by
