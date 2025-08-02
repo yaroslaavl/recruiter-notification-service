@@ -1,4 +1,4 @@
-package org.yaroslaavl.notificationservice.contoller;
+package org.yaroslaavl.notificationservice.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
