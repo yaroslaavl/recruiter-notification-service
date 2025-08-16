@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.yaroslaavl.notificationservice.dto.InitialRegistrationRequestDto;
 import org.yaroslaavl.notificationservice.exception.EmailException;
-import org.yaroslaavl.notificationservice.feignClient.user.UserAccountExists;
+import org.yaroslaavl.notificationservice.feignClient.user.UserFeignClient;
 import org.yaroslaavl.notificationservice.service.EmailVerificationService;
 import org.yaroslaavl.notificationservice.service.RedisService;
 
@@ -29,7 +29,7 @@ public class EmailVerificationServiceImpl implements EmailVerificationService {
     private String mailFrom;
 
     private final JavaMailSender javaMailSender;
-    private final UserAccountExists userAccountExists;
+    private final UserFeignClient userAccountExists;
     private final RedisService redisService;
 
     private static final String VERIFICATION = "VERIFICATION_";
@@ -86,7 +86,7 @@ public class EmailVerificationServiceImpl implements EmailVerificationService {
                 throw new EmailException("Verification code does not match the stored code");
             }
 
-            redisService.setToken(redisKey, EMAIL_STATUS_VERIFICATION, 100, TimeUnit.MINUTES);
+            redisService.setToken(redisKey, EMAIL_STATUS_VERIFICATION, 30, TimeUnit.MINUTES);
             log.info("Email {} successfully verified", email);
         } catch (Exception e) {
             log.error("Failed to verify code for email {}: {}", email, e.getMessage());
