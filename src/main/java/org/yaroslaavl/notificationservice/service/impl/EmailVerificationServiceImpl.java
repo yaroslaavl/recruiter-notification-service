@@ -36,6 +36,16 @@ public class EmailVerificationServiceImpl implements EmailVerificationService {
     private static final String EMAIL_STATUS_VERIFICATION = "VERIFIED_EMAIL";
     private static final String MAIL_SUBJECT = "REGISTRATION CONFIRMATION CODE";
 
+    /**
+     * Sends a verification code to the user's email if the email is not already registered.
+     * The verification code is stored in a Redis datastore with a specified time-to-live (TTL).
+     * If a token already exists for the email, it is deleted before creating a new one.
+     *
+     * @param initialRegistrationRequestDto the data transfer object containing user registration details,
+     *                                      primarily the email to be verified.
+     * @throws MailSendException if an error occurs while sending the verification email.
+     * @throws EmailException if the email is already registered or other validation failures occur.
+     */
     @Async
     @Override
     public void requestVerification(InitialRegistrationRequestDto initialRegistrationRequestDto) {
@@ -66,6 +76,18 @@ public class EmailVerificationServiceImpl implements EmailVerificationService {
         }
     }
 
+    /**
+     * Verifies the provided verification code for the specified email.
+     * Ensures that the email has not been previously registered and the verification code
+     * matches the code stored in the system's Redis cache.
+     * If the verification is successful, marks the email as verified in the cache.
+     *
+     * @param verificationCode the verification code provided by the user for validation.
+     * @param email the email address being verified.
+     * @throws EmailException if the email is already registered in the system, the verification
+     *                        session has expired, the verification code does not match,
+     *                        or any internal error occurs during the process.
+     */
     @Override
     public void verifyCode(String verificationCode, String email) {
         String redisKey = VERIFICATION + email;
@@ -94,6 +116,14 @@ public class EmailVerificationServiceImpl implements EmailVerificationService {
         }
     }
 
+    /**
+     * Checks the verification status of a given email address.
+     * Ensures that the email has been marked as verified in the Redis datastore.
+     *
+     * @param email the email address to check for verification status.
+     * @return the email address if it has been successfully verified.
+     * @throws EmailException if the verification token is expired, invalid, or the email has not been verified.
+     */
     @Override
     public String checkEmailVerification(String email) {
         String hasToken = redisService.hasToken(VERIFICATION + email);
