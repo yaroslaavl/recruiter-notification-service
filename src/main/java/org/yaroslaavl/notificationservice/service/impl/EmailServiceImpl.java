@@ -1,19 +1,22 @@
 package org.yaroslaavl.notificationservice.service.impl;
 
+import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.MailException;
 import org.springframework.mail.MailSendException;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.yaroslaavl.notificationservice.dto.InitialRegistrationRequestDto;
 import org.yaroslaavl.notificationservice.exception.EmailException;
 import org.yaroslaavl.notificationservice.feignClient.user.UserFeignClient;
-import org.yaroslaavl.notificationservice.service.EmailVerificationService;
+import org.yaroslaavl.notificationservice.service.EmailService;
 import org.yaroslaavl.notificationservice.service.RedisService;
 
 import java.util.concurrent.ThreadLocalRandom;
@@ -23,7 +26,7 @@ import java.util.concurrent.TimeUnit;
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
-public class EmailVerificationServiceImpl implements EmailVerificationService {
+public class EmailServiceImpl implements EmailService {
 
     @Value("${mail.send_from}")
     private String mailFrom;
@@ -133,6 +136,18 @@ public class EmailVerificationServiceImpl implements EmailVerificationService {
             throw new EmailException("Verification code is expired or not valid");
         }
         return email;
+    }
+
+    @Override
+    @SneakyThrows
+    public void sendEmail(String to, String subject, String body) {
+        MimeMessage message = javaMailSender.createMimeMessage();
+        MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+        helper.setTo(to);
+        helper.setFrom(mailFrom);
+        helper.setSubject(subject);
+        helper.setText(body, true);
+        this.javaMailSender.send(message);
     }
 
     private void sendMailVerificationCode(String email, String verificationCode) throws MailException {
