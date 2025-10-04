@@ -1,10 +1,12 @@
 package org.yaroslaavl.notificationservice.database.entity.enums;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 
 import java.util.List;
 
 @Getter
+@Schema(description = "EntityType")
 public enum EntityType {
     // ==== SYSTEM EVENTS ====
     SYSTEM(null, null),

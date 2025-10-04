@@ -1,5 +1,8 @@
 package org.yaroslaavl.notificationservice.exception.error;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+
+@Schema(description = "ErrorType")
 public enum ErrorType {
 
     ALREADY_REGISTERED,
