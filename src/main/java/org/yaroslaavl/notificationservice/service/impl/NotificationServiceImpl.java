@@ -4,6 +4,8 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StreamUtils;
 import org.yaroslaavl.notificationservice.database.entity.Notification;
@@ -11,13 +13,17 @@ import org.yaroslaavl.notificationservice.database.entity.enums.EntityType;
 import org.yaroslaavl.notificationservice.database.entity.enums.NotificationType;
 import org.yaroslaavl.notificationservice.database.repository.NotificationRepository;
 import org.yaroslaavl.notificationservice.dto.NotificationDto;
+import org.yaroslaavl.notificationservice.dto.NotificationShortDto;
+import org.yaroslaavl.notificationservice.dto.PageShortDto;
 import org.yaroslaavl.notificationservice.exception.MissingEmailException;
+import org.yaroslaavl.notificationservice.mapper.NotificationMapper;
 import org.yaroslaavl.notificationservice.service.EmailService;
 import org.yaroslaavl.notificationservice.service.NotificationService;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
@@ -29,6 +35,7 @@ public class NotificationServiceImpl implements NotificationService {
 
     private final NotificationRepository notificationRepository;
     private final EmailService emailService;
+    private final NotificationMapper notificationMapper;
 
     @Override
     @Transactional
@@ -42,8 +49,8 @@ public class NotificationServiceImpl implements NotificationService {
         }
 
         Notification notification = Notification.builder()
-                .userId(notificationDto.userId() != null ? UUID.fromString(notificationDto.userId()) : null)
-                .targetUserId(UUID.fromString(notificationDto.targetUserId()))
+                .userId(notificationDto.userId() != null ? notificationDto.userId() : null)
+                .targetUserId(notificationDto.targetUserId())
                 .entityId(notificationDto.entityId() != null ? UUID.fromString(notificationDto.entityId()) : null)
                 .entityType(entityType)
                 .content(content)
@@ -77,6 +84,26 @@ public class NotificationServiceImpl implements NotificationService {
         }
 
         return notification;
+    }
+
+    @Override
+    public PageShortDto<NotificationShortDto> mine(String userKeyId, Pageable pageable) {
+        log.info("Attempting to fetch notifications for userId: {}", userKeyId);
+
+        Page<Notification> userNotifications
+                = notificationRepository.findAllByTargetUserIdAndTypeOrderByCreatedAtDesc(userKeyId, NotificationType.DASHBOARD_APP, pageable);
+
+        if (userNotifications.getContent().isEmpty()) {
+            return new PageShortDto<>(Collections.emptyList(), 0, 0, 0, 0);
+        }
+
+        return  new PageShortDto<>(
+                notificationMapper.toNotificationShortDto(userNotifications.getContent()),
+                userNotifications.getTotalElements(),
+                userNotifications.getTotalPages(),
+                userNotifications.getNumber(),
+                userNotifications.getNumberOfElements()
+        );
     }
 
 

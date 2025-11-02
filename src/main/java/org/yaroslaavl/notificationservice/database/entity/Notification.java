@@ -25,10 +25,10 @@ public class Notification {
     UUID id;
 
     @Column(name = "user_id")
-    UUID userId;
+    String userId;
 
     @Column(name = "target_user_id", nullable = false)
-    UUID targetUserId;
+    String targetUserId;
 
     @Column(name = "entity_id")
     UUID entityId;
