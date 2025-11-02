@@ -11,45 +11,47 @@ public enum EntityType {
     // ==== SYSTEM EVENTS ====
     SYSTEM(null, null),
 
+    SYSTEM_USER_REGISTRATION("Hello, [[firstName]]. Thank you for registering on our website.", List.of("firstName")),
+
     // ==== VACANCY EVENTS ====
     VACANCY_OPENED_FOR_APPLICATIONS(
-            "Vacancy [[vacancyTitle]] is now open for applications until [[applicationDeadline]].",
+            "Vacancy ''[[vacancyTitle]]'' is now open for applications [[applicationDeadline]].",
             List.of("vacancyTitle", "applicationDeadline")
     ),
 
     VACANCY_TEMPORARY_BLOCKED(
-            "Vacancy [[vacancyTitle]] has been temporarily blocked. You reached maximum of reports: [[reports]]",
+            "Vacancy '[[vacancyTitle]]' has been temporarily blocked. You reached maximum of reports: [[reports]]",
             List.of("vacancyTitle", "reports")
     ),
 
     VACANCY_EXPIRED(
-            "Vacancy [[vacancyTitle]] has expired on [[expiredAt]].",
+            "Vacancy '[[vacancyTitle]]' has expired on [[expiredAt]].",
             List.of("vacancyTitle", "expiredAt")
     ),
 
     VACANCY_REPORTED(
-            "Vacancy [[vacancyTitle]] was reported. Reason: [[reason]]. Thank you for informing us about violations.",
+            "Vacancy '[[vacancyTitle]]' was reported. Reason: [[reason]]. Thank you for informing us about violations.",
             List.of("vacancyTitle", "reason")
     ),
 
     VACANCY_CREATED(
-            "Vacancy [[vacancyTitle]] was created on [[createdAt]].",
+            "Vacancy '[[vacancyTitle]]' was created on [[createdAt]].",
             List.of("vacancyTitle", "createdAt")
     ),
 
     // ==== APPLICATION EVENTS ====
     APPLICATION_SUBMITTED(
-            "Application submitted for vacancy [[vacancyTitle]] on [[submittedAt]].",
+            "Application submitted for vacancy '[[vacancyTitle]]' on [[submittedAt]].",
             List.of("vacancyTitle", "submittedAt")
     ),
 
     APPLICATION_APPROVED(
-            "Application for vacancy [[vacancyTitle]] was approved on [[approvedAt]].",
+            "Application for vacancy '[[vacancyTitle]]' was approved on [[approvedAt]].",
             List.of("vacancyTitle", "approvedAt")
     ),
 
     APPLICATION_STATUS_CHANGED(
-            "Application for vacancy [[vacancyTitle]] changed status from [[oldStatus]] to [[newStatus]] on [[changedAt]].",
+            "Application for vacancy '[[vacancyTitle]]' changed status from [[oldStatus]] to [[newStatus]] on [[changedAt]].",
             List.of("vacancyTitle", "oldStatus", "newStatus", "changedAt")
     );
 
