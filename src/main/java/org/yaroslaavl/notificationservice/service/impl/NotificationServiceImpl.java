@@ -23,10 +23,7 @@ import org.yaroslaavl.notificationservice.service.NotificationService;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.time.LocalDateTime;
-import java.util.Collections;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Slf4j
 @Service
@@ -37,15 +34,36 @@ public class NotificationServiceImpl implements NotificationService {
     private final EmailService emailService;
     private final NotificationMapper notificationMapper;
 
+    private static final Map<String, String> APPLICATION_STATUSES = Map.of(
+            "NO_MORE_INTERESTS", "No more interests",
+            "VIEWED", "Viewed",
+            "IN_PROGRESS", "In progress",
+            "ACCEPTED", "Accepted",
+            "RESOLVED", "Resolved",
+            "NEW", "New",
+            "REJECTED", "Rejected"
+    );
+
     @Override
     @Transactional
     public Notification create(NotificationDto notificationDto) {
         NotificationType notificationType = NotificationType.valueOf(notificationDto.notificationType());
         EntityType entityType = EntityType.valueOf(notificationDto.entityType());
+        Map<String, String> requestedVariables = notificationDto.contentVariables();
+        Map<String, String> variables = new HashMap<>();
+
+        if (entityType == EntityType.APPLICATION_STATUS_CHANGED) {
+            for (Map.Entry<String, String> entry : requestedVariables.entrySet()) {
+                String key = entry.getKey();
+                String value = entry.getValue();
+
+                variables.put(key, APPLICATION_STATUSES.getOrDefault(value, value));
+            }
+        }
 
         String content = notificationDto.content();
         if (notificationDto.contentVariables() != null) {
-            content = renderContent(notificationDto.content(), notificationDto.contentVariables(), notificationType, entityType);
+            content = renderContent(notificationDto.content(), variables, notificationType, entityType);
         }
 
         Notification notification = Notification.builder()
