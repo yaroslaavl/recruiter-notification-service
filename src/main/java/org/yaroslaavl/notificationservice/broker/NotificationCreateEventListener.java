@@ -25,6 +25,11 @@ public class NotificationCreateEventListener {
         processMessage(notificationDto, "in-app");
     }
 
+    @RabbitListener(queues = "${rabbitmq.queues.communication.name}", containerFactory = "rabbitListenerContainerFactory")
+    public void handleCommunicationEmailMessage(NotificationDto notificationDto) {
+        processMessage(notificationDto, "email");
+    }
+
     private void processMessage(NotificationDto dto, String channel) {
         log.info("Received {} notification: {}", channel, dto);
         try {

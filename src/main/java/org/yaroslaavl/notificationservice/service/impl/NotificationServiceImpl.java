@@ -16,6 +16,7 @@ import org.yaroslaavl.notificationservice.dto.NotificationDto;
 import org.yaroslaavl.notificationservice.dto.NotificationShortDto;
 import org.yaroslaavl.notificationservice.dto.PageShortDto;
 import org.yaroslaavl.notificationservice.exception.MissingEmailException;
+import org.yaroslaavl.notificationservice.feignClient.user.UserFeignClient;
 import org.yaroslaavl.notificationservice.mapper.NotificationMapper;
 import org.yaroslaavl.notificationservice.service.EmailService;
 import org.yaroslaavl.notificationservice.service.NotificationService;
@@ -33,6 +34,7 @@ public class NotificationServiceImpl implements NotificationService {
     private final NotificationRepository notificationRepository;
     private final EmailService emailService;
     private final NotificationMapper notificationMapper;
+    private final UserFeignClient client;
 
     private static final Map<String, String> APPLICATION_STATUSES = Map.of(
             "NO_MORE_INTERESTS", "No more interests",
@@ -50,21 +52,15 @@ public class NotificationServiceImpl implements NotificationService {
         NotificationType notificationType = NotificationType.valueOf(notificationDto.notificationType());
         EntityType entityType = EntityType.valueOf(notificationDto.entityType());
         Map<String, String> requestedVariables = notificationDto.contentVariables();
-        Map<String, String> variables = new HashMap<>();
+        Map<String, String> variables = new HashMap<>(requestedVariables);
 
         if (entityType == EntityType.APPLICATION_STATUS_CHANGED) {
             for (Map.Entry<String, String> entry : requestedVariables.entrySet()) {
-                String key = entry.getKey();
-                String value = entry.getValue();
-
-                variables.put(key, APPLICATION_STATUSES.getOrDefault(value, value));
+                variables.put(entry.getKey(), APPLICATION_STATUSES.getOrDefault(entry.getValue(), entry.getValue()));
             }
         }
 
-        String content = notificationDto.content();
-        if (notificationDto.contentVariables() != null) {
-            content = renderContent(notificationDto.content(), variables, notificationType, entityType);
-        }
+        String content = renderContent(notificationDto.content(), variables, notificationType, entityType);
 
         Notification notification = Notification.builder()
                 .userId(notificationDto.userId() != null ? notificationDto.userId() : null)
@@ -78,15 +74,19 @@ public class NotificationServiceImpl implements NotificationService {
                 .build();
 
         notificationRepository.saveAndFlush(notification);
-
+        String to;
         if (notificationType == NotificationType.EMAIL) {
-            String to = Optional.ofNullable(notificationDto.contentVariables())
+             to = Optional.of(notificationDto.contentVariables())
                     .map(vars -> vars.get("email"))
                     .orElse(null);
 
             if (to == null || to.isBlank()) {
-                log.error("Missing 'email' in contentVariables: {}", notificationDto.contentVariables());
-                throw new MissingEmailException("Missing email in contentVariables");
+                to = client.getUserShortInfo(notificationDto.targetUserId()).email();
+
+                if (to == null || to.isBlank()) {
+                    log.error("Missing 'email' in contentVariables: {}", notificationDto.contentVariables());
+                    throw new MissingEmailException("Missing email in contentVariables");
+                }
             }
 
             try {
