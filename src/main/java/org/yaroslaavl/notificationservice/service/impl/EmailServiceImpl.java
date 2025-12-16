@@ -66,7 +66,6 @@ public class EmailServiceImpl implements EmailService {
 
             try {
                 sendMailVerificationCode(email, code);
-                log.info("Mail sent to: {}", email);
             } catch (MailException e) {
                 log.error(e.getMessage());
                 throw new MailSendException("Unable to send email to: " + email);
@@ -112,7 +111,6 @@ public class EmailServiceImpl implements EmailService {
             }
 
             redisService.setToken(redisKey, EMAIL_STATUS_VERIFICATION, 30, TimeUnit.MINUTES);
-            log.info("Email {} successfully verified", email);
         } catch (Exception e) {
             log.error("Failed to verify code for email {}: {}", email, e.getMessage());
             throw new EmailException("Failed to verify email due to an internal error");

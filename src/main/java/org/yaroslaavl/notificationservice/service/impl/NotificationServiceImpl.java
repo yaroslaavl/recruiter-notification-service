@@ -95,7 +95,6 @@ public class NotificationServiceImpl implements NotificationService {
                         notificationDto.content() != null ? notificationDto.content() : "Notification",
                         notification.getContent()
                 );
-                log.info("Email sent to: {}", to);
             } catch (Exception e) {
                 log.error("Failed to send email to {}: {}", to, e.getMessage());
             }
