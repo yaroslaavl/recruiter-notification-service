@@ -17,18 +17,17 @@ email:
   allowedEmails:
     - gmail.com
     - yahoo.com
-    - yahoo.co.uk
     - outlook.com
     - hotmail.com
     - icloud.com
     - mail.com
     - aol.com
     - protonmail.com
+    - recruiter-app.com
     - zoho.com
     - gmx.com
     - gmx.de
     - web.de
-    - tutanota.com
     - seznam.cz
     - wp.pl
     - o2.pl
@@ -38,16 +37,4 @@ email:
     - poczta.fm
     - tlen.pl
     - ukr.net
-    - i.ua
-    - meta.ua
     - bigmir.net
-    - email.ua
-    - mail.ua
-    - yandex.com
-    - yandex.ru
-    - mail.ru
-    - bk.ru
-    - inbox.ru
-    - list.ru
-    - rambler.ru
-    - tut.by
