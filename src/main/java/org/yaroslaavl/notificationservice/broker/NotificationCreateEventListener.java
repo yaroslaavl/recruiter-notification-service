@@ -31,7 +31,7 @@ public class NotificationCreateEventListener {
     }
 
     private void processMessage(NotificationDto dto, String channel) {
-        log.info("Received {} notification: {}", channel, dto);
+        log.info("Received {} notification", channel);
         try {
             notificationService.create(dto);
         } catch (Exception e) {
